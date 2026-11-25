@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Familie Christofori</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%230A0A0A'/%3E%3Ctext x='32' y='44' font-family='Arial Black,Arial' font-weight='900' font-size='34' fill='%23FFD400' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --black:#0A0A0A; --yellow:#FFD400;
+    --panel:#151515; --line:#2a2a2a; --text:#f2f2f2; --muted:#9a9a9a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    background:var(--black); color:var(--text); min-height:100vh;
+    display:flex; flex-direction:column;
+  }
+  a{color:inherit;text-decoration:none}
+
+  /* Kopf */
+  header{
+    padding:56px 20px 36px; text-align:center;
+    background:
+      radial-gradient(circle at 50% -40%, rgba(255,212,0,.18), transparent 60%),
+      var(--black);
+    border-bottom:4px solid var(--yellow);
+  }
+  .mark{display:inline-flex;align-items:center;gap:14px}
+  .mark .word{font-weight:900;font-size:clamp(2rem,6vw,3.4rem);letter-spacing:-.03em}
+  .mark .block{
+    background:var(--yellow); color:var(--black); font-weight:900;
+    font-size:clamp(2rem,6vw,3.4rem); letter-spacing:-.03em;
+    padding:0 .35em; border-radius:.28em; line-height:1.25;
+  }
+  .echo{display:inline-block;width:36px;height:52px;margin-left:2px}
+  .greeting{margin-top:14px;color:var(--muted);font-size:1rem}
+  .greeting strong{color:var(--yellow);font-weight:700}
+
+  /* Suche */
+  form.search{
+    margin:30px auto 0; max-width:640px; display:flex;
+    background:#fff; border-radius:999px; overflow:hidden;
+    box-shadow:0 0 0 3px var(--yellow), 0 10px 30px rgba(0,0,0,.5);
+  }
+  form.search input{
+    flex:1; border:0; outline:0; padding:16px 22px; font-size:1.05rem;
+    color:var(--black); background:transparent; min-width:0;
+  }
+  form.search button{
+    border:0; cursor:pointer; background:var(--black); color:var(--yellow);
+    font-weight:800; padding:0 26px; font-size:1rem;
+  }
+  form.search button:hover{background:#222}
+
+  /* Kacheln */
+  main{flex:1; width:100%; max-width:1180px; margin:0 auto; padding:40px 20px 20px}
+  .grid{display:grid; gap:22px; grid-template-columns:repeat(auto-fill,minmax(420px,1fr))}
+  section.group{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px;
+  }
+  section.group h2{
+    font-size:.8rem; text-transform:uppercase; letter-spacing:.14em;
+    color:var(--yellow); margin-bottom:14px; display:flex; align-items:center; gap:10px;
+  }
+  section.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+  section.group ul{list-style:none;display:grid;gap:6px}
+  section.group a{
+    display:flex; align-items:center; gap:12px; padding:9px 10px; border-radius:10px;
+    transition:background .15s, color .15s;
+  }
+  section.group a:hover, section.group a:focus-visible{background:var(--yellow);color:var(--black);outline:none}
+  section.group a:hover .ico, section.group a:focus-visible .ico{background:var(--black);color:var(--yellow)}
+  .ico{
+    flex:none; width:30px; height:30px; border-radius:8px; display:grid; place-items:center;
+    background:#262626; color:var(--yellow); font-weight:800; font-size:.8rem;
+  }
+  .lbl small{display:block;color:var(--muted);font-size:.75rem;margin-top:1px}
+  section.group a:hover small, section.group a:focus-visible small{color:#333}
+
+  /* Über uns */
+  .about{
+    margin-top:22px; background:var(--yellow); color:var(--black);
+    border-radius:16px; padding:26px 28px;
+  }
+  .about h2{font-weight:900;font-size:1.4rem;margin-bottom:6px}
+  .about p{max-width:70ch;line-height:1.55}
+
+  footer{
+    text-align:center; color:var(--muted); font-size:.8rem; padding:26px 20px 32px;
+  }
+  footer span{color:var(--yellow)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="mark" aria-label="Familie Christofori">
+    <span class="word">Familie</span>
+    <span class="block">Christofori</span>
+    <svg class="echo" viewBox="0 0 36 52" aria-hidden="true">
+      <path d="M6 14 A14 14 0 0 1 6 38" fill="none" stroke="#FFD400" stroke-width="4" stroke-linecap="round"/>
+      <path d="M16 6 A24 24 0 0 1 16 46" fill="none" stroke="#FFD400" stroke-width="4" stroke-linecap="round" opacity=".55"/>
+    </svg>
+  </div>
+  <p class="greeting"><strong id="gruss">Hallo</strong> · <span id="datum"></span></p>
+
+  <form class="search" action="https://www.google.com/search" method="get" role="search" target="_self">
+    <input type="search" name="q" placeholder="Mit Google suchen …" aria-label="Google-Suche" autocomplete="off" autofocus>
+    <button type="submit">Suchen</button>
+  </form>
+</header>
+
+<main>
+  <div class="grid">
+
+    <section class="group">
+      <h2>Mühlacker &amp; Region</h2>
+      <ul>
+        <li><a href="https://www.dwd.de" target="_blank" rel="noopener"><span class="ico">☀</span><span class="lbl">Wetter (DWD)<small>Deutscher Wetterdienst</small></span></a></li>
+        <li><a href="https://www.muehlacker.de" target="_blank" rel="noopener"><span class="ico">M</span><span class="lbl">Stadt Mühlacker<small>Rathaus, Termine, Abfall</small></span></a></li>
+        <li><a href="https://www.pz-news.de" target="_blank" rel="noopener"><span class="ico">PZ</span><span class="lbl">PZ-news<small>Pforzheim &amp; Enzkreis</small></span></a></li>
+        <li><a href="https://www.bahn.de" target="_blank" rel="noopener"><span class="ico">DB</span><span class="lbl">Deutsche Bahn<small>Verbindungen ab Mühlacker</small></span></a></li>
+        <li><a href="https://www.google.de/maps" target="_blank" rel="noopener"><span class="ico">⌖</span><span class="lbl">Google Maps<small>Routen &amp; Verkehr</small></span></a></li>
+      </ul>
+    </section>
+
+    <section class="group">
+      <h2>Nachrichten</h2>
+      <ul>
+        <li><a href="https://www.tagesschau.de" target="_blank" rel="noopener"><span class="ico">TS</span><span class="lbl">tagesschau<small>Nachrichten</small></span></a></li>
+        <li><a href="https://www.swr.de/swraktuell/baden-wuerttemberg/" target="_blank" rel="noopener"><span class="ico">SWR</span><span class="lbl">SWR Aktuell BW<small>Baden-Württemberg</small></span></a></li>
+      </ul>
+    </section>
+
+  </div>
+
+  <div class="about">
+    <h2>Über uns</h2>
+    <p>Herzlich willkommen auf der Seite der Familie Christofori aus Mühlacker. Schön, dass du vorbeischaust! Dieser Text ist ein Platzhalter und kann frei angepasst werden.</p>
+  </div>
+</main>
+
+<footer>
+  © <span id="jahr"></span> Familie Christofori · <span>familie-christofori.de</span>
+</footer>
+
+<script>
+  (function(){
+    var d = new Date(), h = d.getHours();
+    var g = h < 5 ? "Gute Nacht" : h < 11 ? "Guten Morgen" : h < 14 ? "Mahlzeit" : h < 18 ? "Guten Tag" : h < 22 ? "Guten Abend" : "Gute Nacht";
+    document.getElementById("gruss").textContent = g;
+    document.getElementById("datum").textContent = d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+    document.getElementById("jahr").textContent = d.getFullYear();
+  })();
+</script>
+</body>

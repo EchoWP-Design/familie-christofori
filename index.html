@@ -7,152 +7,181 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%230A0A0A'/%3E%3Ctext x='32' y='44' font-family='Arial Black,Arial' font-weight='900' font-size='34' fill='%23FFD400' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
 <style>
-  :root{
-    --black:#0A0A0A; --yellow:#FFD400;
-    --panel:#151515; --line:#2a2a2a; --text:#f2f2f2; --muted:#9a9a9a;
-  }
+  :root{ --y:#FFD400; --k:#0A0A0A; --ink:#d8dde3; --dim:#8a96a3; --line:#2a2f35; }
   *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
   body{
+    background:var(--k); color:var(--ink); overflow:hidden;
     font-family:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
-    background:var(--black); color:var(--text); min-height:100vh;
-    display:flex; flex-direction:column;
   }
   a{color:inherit;text-decoration:none}
 
-  /* Kopf */
-  header{
-    padding:56px 20px 36px; text-align:center;
-    background:
-      radial-gradient(circle at 50% -40%, rgba(255,212,0,.18), transparent 60%),
-      var(--black);
-    border-bottom:4px solid var(--yellow);
-  }
-  .mark{display:inline-flex;align-items:center;gap:14px}
-  .mark .word{font-weight:900;font-size:clamp(2rem,6vw,3.4rem);letter-spacing:-.03em}
-  .mark .block{
-    background:var(--yellow); color:var(--black); font-weight:900;
-    font-size:clamp(2rem,6vw,3.4rem); letter-spacing:-.03em;
-    padding:0 .35em; border-radius:.28em; line-height:1.25;
-  }
-  .echo{display:inline-block;width:36px;height:52px;margin-left:2px}
-  .greeting{margin-top:14px;color:var(--muted);font-size:1rem}
-  .greeting strong{color:var(--yellow);font-weight:700}
+  /* Leuchtspur-EKG im Hintergrund (wie EchoWP-Sim Standby) */
+  #ecg,#head{position:fixed;inset:0;width:100%;height:100%;opacity:.4;pointer-events:none}
 
-  /* Suche */
+  .screen{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
+
+  /* Kopfzeile */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:2vw;padding:3vh 2.5vw 0;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:.6vw}
+  .brand .wm,.brand .wb{font-family:"Inter Display",Inter,"Segoe UI Black","Arial Black",sans-serif;font-weight:900}
+  .brand .wm{font-size:clamp(22px,5vh,48px);color:var(--y)}
+  .brand .wb{font-size:clamp(16px,3.4vh,34px);background:var(--y);color:var(--k);padding:.5vh .7vw;border-radius:1vh}
+  .zulu{display:flex;gap:2.2vw;align-items:center;font-variant-numeric:tabular-nums}
+  .zulu div{text-align:right}
+  .zulu small{display:block;font-size:clamp(10px,1.5vh,14px);letter-spacing:.2em;color:var(--dim)}
+  .zulu b{font-size:clamp(18px,3.4vh,34px);color:var(--y);font-weight:700;letter-spacing:.04em}
+
+  /* Mitte */
+  .center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;padding:0 2.5vw}
+  .time{font-size:min(22vh,16vw);font-weight:700;color:var(--y);font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1}
+  .date{font-size:clamp(16px,4.2vh,40px);color:var(--ink);margin-top:1.5vh}
+
+  .links{display:flex;flex-wrap:wrap;justify-content:center;gap:1.2vh 1vw;margin-top:5vh;max-width:1200px;max-height:34vh;overflow:auto;padding:4px}
+  .links a{
+    display:flex;flex-direction:column;min-width:150px;padding:1.2vh 1.2vw;border-radius:1vh;
+    background:rgba(10,10,10,.75);border:1px solid var(--line);backdrop-filter:blur(2px);
+    transition:background .15s,color .15s,border-color .15s;
+  }
+  .links a b{font-size:clamp(14px,2.1vh,20px);font-weight:700;color:#fff}
+  .links a small{font-size:clamp(11px,1.5vh,14px);color:var(--dim);margin-top:2px}
+  .links a:hover,.links a:focus-visible{background:var(--y);border-color:var(--y);outline:none}
+  .links a:hover b,.links a:focus-visible b{color:var(--k)}
+  .links a:hover small,.links a:focus-visible small{color:#333}
+
+  /* Suchzeile unten */
+  .bottom{padding:0 2.5vw 3.5vh;display:flex;flex-direction:column;align-items:center;gap:1.2vh}
   form.search{
-    margin:30px auto 0; max-width:640px; display:flex;
-    background:#fff; border-radius:999px; overflow:hidden;
-    box-shadow:0 0 0 3px var(--yellow), 0 10px 30px rgba(0,0,0,.5);
+    width:min(760px,100%);display:flex;border-radius:999px;overflow:hidden;
+    background:rgba(10,10,10,.85);border:2px solid var(--y);box-shadow:0 0 24px rgba(255,212,0,.18);
   }
-  form.search input{
-    flex:1; border:0; outline:0; padding:16px 22px; font-size:1.05rem;
-    color:var(--black); background:transparent; min-width:0;
-  }
-  form.search button{
-    border:0; cursor:pointer; background:var(--black); color:var(--yellow);
-    font-weight:800; padding:0 26px; font-size:1rem;
-  }
-  form.search button:hover{background:#222}
+  form.search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#fff;padding:1.6vh 22px;font-size:clamp(15px,2.1vh,20px)}
+  form.search input::placeholder{color:var(--dim)}
+  form.search button{border:0;cursor:pointer;background:var(--y);color:var(--k);font-weight:800;padding:0 26px;font-size:clamp(14px,1.9vh,18px)}
+  .hint{font-size:clamp(10px,1.4vh,13px);color:#5d6670}
+  .hint a{color:#5d6670}
+  .hint a:hover{color:var(--y)}
 
-  /* Kacheln */
-  main{flex:1; width:100%; max-width:1180px; margin:0 auto; padding:40px 20px 20px}
-  .grid{display:grid; gap:22px; grid-template-columns:repeat(auto-fill,minmax(420px,1fr))}
-  section.group{
-    background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px;
+  @media (max-width:640px){
+    body{overflow:auto}
+    .top{justify-content:center}
+    .zulu{width:100%;justify-content:center}
+    .zulu div{text-align:center}
+    .links a{min-width:calc(50% - 8px)}
+    .links{max-height:none}
+    .brand .wm{font-size:28px} .brand .wb{font-size:19px;padding:4px 8px}
+    .date{font-size:19px;text-align:center}
+    .zulu b{font-size:20px}
   }
-  section.group h2{
-    font-size:.8rem; text-transform:uppercase; letter-spacing:.14em;
-    color:var(--yellow); margin-bottom:14px; display:flex; align-items:center; gap:10px;
-  }
-  section.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
-  section.group ul{list-style:none;display:grid;gap:6px}
-  section.group a{
-    display:flex; align-items:center; gap:12px; padding:9px 10px; border-radius:10px;
-    transition:background .15s, color .15s;
-  }
-  section.group a:hover, section.group a:focus-visible{background:var(--yellow);color:var(--black);outline:none}
-  section.group a:hover .ico, section.group a:focus-visible .ico{background:var(--black);color:var(--yellow)}
-  .ico{
-    flex:none; width:30px; height:30px; border-radius:8px; display:grid; place-items:center;
-    background:#262626; color:var(--yellow); font-weight:800; font-size:.8rem;
-  }
-  .lbl small{display:block;color:var(--muted);font-size:.75rem;margin-top:1px}
-  section.group a:hover small, section.group a:focus-visible small{color:#333}
-
-  /* Über uns */
-  .about{
-    margin-top:22px; background:var(--yellow); color:var(--black);
-    border-radius:16px; padding:26px 28px;
-  }
-  .about h2{font-weight:900;font-size:1.4rem;margin-bottom:6px}
-  .about p{max-width:70ch;line-height:1.55}
-
-  footer{
-    text-align:center; color:var(--muted); font-size:.8rem; padding:26px 20px 32px;
-  }
-  footer span{color:var(--yellow)}
 </style>
 </head>
 <body>
+<canvas id="ecg"></canvas><canvas id="head"></canvas>
 
-<header>
-  <div class="mark" aria-label="Familie Christofori">
-    <span class="word">Familie</span>
-    <span class="block">Christofori</span>
-    <svg class="echo" viewBox="0 0 36 52" aria-hidden="true">
-      <path d="M6 14 A14 14 0 0 1 6 38" fill="none" stroke="#FFD400" stroke-width="4" stroke-linecap="round"/>
-      <path d="M16 6 A24 24 0 0 1 16 46" fill="none" stroke="#FFD400" stroke-width="4" stroke-linecap="round" opacity=".55"/>
-    </svg>
-  </div>
-  <p class="greeting"><strong id="gruss">Hallo</strong> · <span id="datum"></span></p>
+<div class="screen">
+  <header class="top">
+    <div class="brand"><span class="wm">Familie</span><span class="wb">Christofori</span></div>
+    <div class="zulu" aria-label="Zulu-Zeit">
+      <div><small>ZULU</small><b id="zulu">--:--:--Z</b></div>
+      <div><small>DTG</small><b id="dtg">------Z --- --</b></div>
+    </div>
+  </header>
 
-  <form class="search" action="https://www.google.com/search" method="get" role="search" target="_self">
-    <input type="search" name="q" placeholder="Mit Google suchen …" aria-label="Google-Suche" autocomplete="off" autofocus>
-    <button type="submit">Suchen</button>
-  </form>
-</header>
+  <main class="center">
+    <div class="time" id="time">--:--:--</div>
+    <div class="date" id="date"></div>
+    <nav class="links" id="links" aria-label="Links"></nav>
+  </main>
 
-<main>
-  <div class="grid">
-
-    <section class="group">
-      <h2>Mühlacker &amp; Region</h2>
-      <ul>
-        <li><a href="https://www.dwd.de" target="_blank" rel="noopener"><span class="ico">☀</span><span class="lbl">Wetter (DWD)<small>Deutscher Wetterdienst</small></span></a></li>
-        <li><a href="https://www.muehlacker.de" target="_blank" rel="noopener"><span class="ico">M</span><span class="lbl">Stadt Mühlacker<small>Rathaus, Termine, Abfall</small></span></a></li>
-        <li><a href="https://www.pz-news.de" target="_blank" rel="noopener"><span class="ico">PZ</span><span class="lbl">PZ-news<small>Pforzheim &amp; Enzkreis</small></span></a></li>
-        <li><a href="https://www.bahn.de" target="_blank" rel="noopener"><span class="ico">DB</span><span class="lbl">Deutsche Bahn<small>Verbindungen ab Mühlacker</small></span></a></li>
-        <li><a href="https://www.google.de/maps" target="_blank" rel="noopener"><span class="ico">⌖</span><span class="lbl">Google Maps<small>Routen &amp; Verkehr</small></span></a></li>
-      </ul>
-    </section>
-
-    <section class="group">
-      <h2>Nachrichten</h2>
-      <ul>
-        <li><a href="https://www.tagesschau.de" target="_blank" rel="noopener"><span class="ico">TS</span><span class="lbl">tagesschau<small>Nachrichten</small></span></a></li>
-        <li><a href="https://www.swr.de/swraktuell/baden-wuerttemberg/" target="_blank" rel="noopener"><span class="ico">SWR</span><span class="lbl">SWR Aktuell BW<small>Baden-Württemberg</small></span></a></li>
-      </ul>
-    </section>
-
-  </div>
-
-  <div class="about">
-    <h2>Über uns</h2>
-    <p>Herzlich willkommen auf der Seite der Familie Christofori aus Mühlacker. Schön, dass du vorbeischaust! Dieser Text ist ein Platzhalter und kann frei angepasst werden.</p>
-  </div>
-</main>
-
-<footer>
-  © <span id="jahr"></span> Familie Christofori · <span>familie-christofori.de</span>
-</footer>
+  <footer class="bottom">
+    <form class="search" action="https://www.google.com/search" method="get" role="search">
+      <input type="search" name="q" placeholder="Mit Google suchen …" aria-label="Google-Suche" autocomplete="off" autofocus>
+      <button type="submit">Suchen</button>
+    </form>
+    <div class="hint">familie-christofori.de · <a href="admin.html">Verwaltung</a></div>
+  </footer>
+</div>
 
 <script>
-  (function(){
-    var d = new Date(), h = d.getHours();
-    var g = h < 5 ? "Gute Nacht" : h < 11 ? "Guten Morgen" : h < 14 ? "Mahlzeit" : h < 18 ? "Guten Tag" : h < 22 ? "Guten Abend" : "Gute Nacht";
-    document.getElementById("gruss").textContent = g;
-    document.getElementById("datum").textContent = d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-    document.getElementById("jahr").textContent = d.getFullYear();
-  })();
+const $ = id => document.getElementById(id);
+const MON = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+const p2 = n => String(n).padStart(2, "0");
+
+// ---------- Uhr: Ortszeit, Zulu, Datum-Zeit-Gruppe
+function clock(){
+  const d = new Date();
+  $("time").textContent = d.toLocaleTimeString("de-DE");
+  $("date").textContent = d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  $("zulu").textContent = `${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}:${p2(d.getUTCSeconds())}Z`;
+  // DTG nach NATO-Schema: TTHHMMZ MON JJ
+  $("dtg").textContent = `${p2(d.getUTCDate())}${p2(d.getUTCHours())}${p2(d.getUTCMinutes())}Z ${MON[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(-2)}`;
+}
+clock(); setInterval(clock, 1000);
+
+// ---------- Links aus links.json (in der Verwaltung gepflegt)
+const FALLBACK = [
+  {title:"Wetter",sub:"Deutscher Wetterdienst",url:"https://www.dwd.de"},
+  {title:"tagesschau",sub:"Nachrichten",url:"https://www.tagesschau.de"}
+];
+function safeUrl(u){ try{ const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; }catch(e){ return null; } }
+function renderLinks(list){
+  const nav = $("links"); nav.textContent = "";
+  list.forEach(l => {
+    const href = safeUrl(l.url); if (!href || !l.title) return;
+    const a = document.createElement("a");
+    a.href = href; a.target = "_blank"; a.rel = "noopener";
+    const b = document.createElement("b"); b.textContent = l.title; a.appendChild(b);
+    if (l.sub){ const s = document.createElement("small"); s.textContent = l.sub; a.appendChild(s); }
+    nav.appendChild(a);
+  });
+}
+fetch("links.json?v=" + Date.now(), {cache:"no-store"})
+  .then(r => r.ok ? r.json() : Promise.reject())
+  .then(d => renderLinks(Array.isArray(d) ? d : FALLBACK))
+  .catch(() => renderLinks(FALLBACK));
+
+// ---------- Leuchtspur-EKG (nach EchoWP-Sim Standby): Sinusrhythmus 60/min
+const gauss = (x, m, s) => Math.exp(-((x - m) ** 2) / (2 * s * s));
+const ecgVal = t => { const x = t % 1;
+  return 0.13*gauss(x,.18,.025) - 0.12*gauss(x,.355,.008) + 1.0*gauss(x,.38,.011) - 0.28*gauss(x,.405,.01) + 0.3*gauss(x,.66,.05); };
+const g = { cv:$("ecg"), hv:$("head"), ctx:null, hctx:null, last:0, x:-1, y:0, t:0 };
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function frame(ts){
+  requestAnimationFrame(frame);
+  const cv = g.cv, dpr = window.devicePixelRatio || 1;
+  const W = Math.round(cv.clientWidth * dpr), H = Math.round(cv.clientHeight * dpr);
+  if (cv.width !== W || cv.height !== H){
+    cv.width = g.hv.width = W; cv.height = g.hv.height = H;
+    g.ctx = cv.getContext("2d"); g.hctx = g.hv.getContext("2d"); g.x = -1;
+  }
+  const c = g.ctx, now = ts / 1000;
+  if (!g.last){ g.last = now; return; }
+  const dt = Math.min(0.1, now - g.last); g.last = now;
+  c.globalCompositeOperation = "destination-out";
+  c.fillStyle = `rgba(0,0,0,${1 - Math.pow(0.03, dt / 1.5)})`;
+  c.fillRect(0, 0, W, H);
+  c.globalCompositeOperation = "source-over";
+  const sweep = 7;
+  c.lineCap = "round"; c.lineJoin = "round";
+  c.strokeStyle = "#FFD400"; c.shadowColor = "#FFD400";
+  c.lineWidth = 3 * dpr; c.shadowBlur = 18 * dpr;
+  c.beginPath();
+  const steps = Math.max(1, Math.round(dt * 240));
+  for (let i = 1; i <= steps; i++){
+    g.t += dt / steps;
+    const x = (g.t % sweep) / sweep * W, y = H * 0.5 - ecgVal(g.t) * H * 0.22;
+    if (g.x < 0 || x < g.x) c.moveTo(x, y); else { c.moveTo(g.x, g.y); c.lineTo(x, y); }
+    g.x = x; g.y = y;
+  }
+  c.stroke(); c.shadowBlur = 0;
+  const gap = W * 0.7;
+  c.clearRect(g.x + 6 * dpr, 0, gap, H);
+  if (g.x + gap > W) c.clearRect(0, 0, g.x + gap - W, H);
+  const h = g.hctx; h.clearRect(0, 0, W, H);
+  h.shadowColor = "#FFD400"; h.shadowBlur = 32 * dpr; h.fillStyle = "#fff6c2";
+  h.beginPath(); h.arc(g.x, g.y, 5 * dpr, 0, Math.PI * 2); h.fill();
+}
+if (!reduce) requestAnimationFrame(frame);
 </script>
 </body>
+</html>

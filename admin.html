@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verwaltung · Familie Christofori</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root{ --y:#FFD400; --k:#0A0A0A; --panel:#14171a; --line:#2a2f35; --ink:#e8ecef; --dim:#8a96a3; --red:#ff5a4e; --green:#4ade80; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--k);color:var(--ink);font-family:"Inter","Segoe UI",system-ui,Arial,sans-serif;padding:28px 20px 60px}
+  .wrap{max-width:980px;margin:0 auto}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:8px}
+  .brand .wm,.brand .wb{font-family:"Inter Display",Inter,"Segoe UI Black","Arial Black",sans-serif;font-weight:900}
+  .brand .wm{font-size:30px;color:var(--y)}
+  .brand .wb{font-size:20px;background:var(--y);color:var(--k);padding:4px 10px;border-radius:8px}
+  header a{color:var(--dim);font-size:14px}
+  header a:hover{color:var(--y)}
+  section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+  h2{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--y);margin-bottom:14px}
+  label{display:block;font-size:12px;color:var(--dim);margin-bottom:4px}
+  input[type=text],input[type=url],input[type=password]{
+    width:100%;background:#0d0f11;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:10px 12px;font-size:15px}
+  input:focus{outline:none;border-color:var(--y)}
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+  .btn{border:1px solid var(--line);background:#1d2125;color:var(--ink);border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn:hover{border-color:var(--y);color:var(--y)}
+  .btn.primary{background:var(--y);border-color:var(--y);color:var(--k)}
+  .btn.primary:hover{filter:brightness(1.1);color:var(--k)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.sm{padding:6px 10px;font-size:13px}
+  .btn.del:hover{border-color:var(--red);color:var(--red)}
+  .chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--dim)}
+  #status{font-size:14px;min-height:20px}
+  #status.ok{color:var(--green)} #status.err{color:var(--red)} #status.info{color:var(--dim)}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-size:12px;color:var(--dim);font-weight:600;padding:6px 6px;border-bottom:1px solid var(--line)}
+  td{padding:6px;border-bottom:1px solid #1e2226;vertical-align:middle}
+  td input{padding:8px 10px !important;font-size:14px !important}
+  td.act{white-space:nowrap;width:1%}
+  .empty{color:var(--dim);font-size:14px;padding:10px 0}
+  .note{font-size:13px;color:var(--dim);line-height:1.5}
+  .note b{color:var(--ink)}
+  .dirty{display:none;color:var(--y);font-size:13px;font-weight:700}
+  .dirty.on{display:inline}
+  @media (max-width:700px){
+    thead{display:none}
+    table,tbody,tr,td{display:block;width:100%}
+    tr{border:1px solid var(--line);border-radius:10px;padding:6px;margin-bottom:10px}
+    td{border:0}
+    td.act{width:auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="wm">Verwaltung</span><span class="wb">Links</span></div>
+    <a href="./">← zur Startseite</a>
+  </header>
+
+  <section id="login">
+    <h2>Anmeldung</h2>
+    <div class="grid">
+      <div><label for="owner">GitHub-Benutzer</label><input type="text" id="owner" value="echowp-design"></div>
+      <div><label for="repo">Repository</label><input type="text" id="repo" value="familie-christofori"></div>
+      <div><label for="branch">Branch</label><input type="text" id="branch" value="main"></div>
+    </div>
+    <div style="margin-top:12px">
+      <label for="token">GitHub-Token (fein granular, nur dieses Repository, „Contents: Read and write“)</label>
+      <input type="password" id="token" autocomplete="off" placeholder="github_pat_…">
+    </div>
+    <div class="row">
+      <label class="chk"><input type="checkbox" id="remember"> Auf diesem Gerät merken</label>
+      <span style="flex:1"></span>
+      <button class="btn" id="logout" type="button">Abmelden</button>
+      <button class="btn primary" id="load" type="button">Laden</button>
+    </div>
+  </section>
+
+  <section id="editor" hidden>
+    <h2>Links <span class="dirty" id="dirty">· ungespeicherte Änderungen</span></h2>
+    <table>
+      <thead><tr><th>Titel</th><th>Untertitel</th><th>Adresse</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>Noch keine Links vorhanden.</div>
+
+    <h2 style="margin-top:22px">Neuer Link</h2>
+    <form id="add" class="grid" autocomplete="off">
+      <div><label for="nTitle">Titel *</label><input type="text" id="nTitle" required maxlength="40"></div>
+      <div><label for="nSub">Untertitel</label><input type="text" id="nSub" maxlength="60"></div>
+      <div><label for="nUrl">Adresse *</label><input type="text" id="nUrl" required placeholder="https://…" inputmode="url"></div>
+      <div style="align-self:end"><button class="btn" type="submit" style="width:100%">+ Hinzufügen</button></div>
+    </form>
+
+    <div class="row">
+      <button class="btn primary" id="save" type="button">Speichern &amp; veröffentlichen</button>
+      <span id="status" class="info"></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Hinweise</h2>
+    <p class="note">
+      <b>So funktioniert es:</b> Die Links stehen in der Datei <b>links.json</b> im Repository. „Speichern“ schreibt diese Datei über die GitHub-Schnittstelle neu. Danach baut GitHub Pages die Seite neu – nach etwa <b>1–2 Minuten</b> sind die Änderungen sichtbar.<br><br>
+      <b>Sicherheit:</b> Diese Seite ist öffentlich erreichbar, kann ohne gültigen Token aber nichts ändern. Der Token wird nur in diesem Browser gespeichert (bei „merken“ dauerhaft, sonst bis zum Schließen des Tabs) und nur an api.github.com gesendet. Nur auf eigenen Geräten „merken“ anhaken.
+    </p>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const KEY = "fc_admin";
+let links = [], sha = null, dirty = false;
+
+// ---------- Einstellungen / Token
+function loadCfg(){
+  let c = null;
+  try { c = JSON.parse(localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || "null"); } catch(e){}
+  if (!c) return;
+  ["owner","repo","branch","token"].forEach(k => { if (c[k]) $(k).value = c[k]; });
+  $("remember").checked = !!c.remember;
+}
+function saveCfg(){
+  const c = { owner:$("owner").value.trim(), repo:$("repo").value.trim(), branch:$("branch").value.trim() || "main",
+              token:$("token").value.trim(), remember:$("remember").checked };
+  try {
+    localStorage.removeItem(KEY); sessionStorage.removeItem(KEY);
+    (c.remember ? localStorage : sessionStorage).setItem(KEY, JSON.stringify(c));
+  } catch(e){}
+  return c;
+}
+$("logout").onclick = () => {
+  try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch(e){}
+  $("token").value = ""; $("remember").checked = false;
+  $("editor").hidden = true; links = []; sha = null; setDirty(false);
+  status("Abgemeldet – Token aus diesem Browser entfernt.", "info");
+};
+
+// ---------- GitHub-API
+const api = (c, method, body) => fetch(
+  `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/links.json` +
+  (method === "GET" ? `?ref=${encodeURIComponent(c.branch)}` : ""),
+  { method, headers:{ "Authorization":"Bearer " + c.token, "Accept":"application/vnd.github+json",
+      "X-GitHub-Api-Version":"2022-11-28", ...(body ? {"Content-Type":"application/json"} : {}) },
+    body: body ? JSON.stringify(body) : undefined, cache:"no-store" });
+
+const b64dec = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,"")), ch => ch.charCodeAt(0)));
+const b64enc = s => { const b = new TextEncoder().encode(s); let r = ""; b.forEach(x => r += String.fromCharCode(x)); return btoa(r); };
+
+function status(msg, cls){ const s = $("status"); s.textContent = msg; s.className = cls || "info"; }
+function errText(r){ return r.status === 401 ? "Token ungültig oder abgelaufen."
+  : r.status === 403 ? "Keine Berechtigung – hat der Token „Contents: Read and write“ für dieses Repository?"
+  : r.status === 404 ? "Repository nicht gefunden – Name prüfen oder Token-Zugriff auf das Repository fehlt."
+  : r.status === 409 ? "Datei wurde zwischenzeitlich geändert – bitte neu laden."
+  : "Fehler " + r.status + "."; }
+
+$("load").onclick = async () => {
+  const c = saveCfg();
+  if (!c.token){ status("Bitte Token eingeben.", "err"); $("editor").hidden = false; return; }
+  if (dirty && !confirmDiscard()) return;
+  status("Lade …", "info"); $("editor").hidden = false;
+  try {
+    const r = await api(c, "GET");
+    if (r.status === 404){
+      // Prüfen, ob das Repository selbst erreichbar ist
+      const rr = await fetch(`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}`,
+        { headers:{ "Authorization":"Bearer " + c.token, "Accept":"application/vnd.github+json" } });
+      if (!rr.ok){ status(errText(rr), "err"); return; }
+      links = []; sha = null; render(); setDirty(false);
+      status("Noch keine links.json im Repository – sie wird beim ersten Speichern angelegt.", "info"); return;
+    }
+    if (!r.ok){ status(errText(r), "err"); return; }
+    const d = await r.json(); sha = d.sha;
+    const parsed = JSON.parse(b64dec(d.content));
+    links = Array.isArray(parsed) ? parsed.map(l => ({ title:String(l.title||""), sub:String(l.sub||""), url:String(l.url||"") })) : [];
+    render(); setDirty(false);
+    status(`${links.length} Links geladen.`, "ok");
+  } catch(e){ status("Keine Verbindung zu GitHub oder links.json fehlerhaft.", "err"); }
+};
+
+$("save").onclick = async () => {
+  const c = saveCfg();
+  const bad = links.findIndex(l => !l.title.trim() || !validUrl(l.url));
+  if (bad >= 0){ status(`Zeile ${bad + 1}: Titel und gültige Adresse (https://…) erforderlich.`, "err"); return; }
+  $("save").disabled = true; status("Speichere …", "info");
+  try {
+    const body = { message:"Links aktualisiert (Verwaltung)", branch:c.branch,
+      content:b64enc(JSON.stringify(links, null, 2) + "\n") };
+    if (sha) body.sha = sha;
+    const r = await api(c, "PUT", body);
+    if (!r.ok){ status(errText(r), "err"); return; }
+    const d = await r.json(); sha = d.content.sha; setDirty(false);
+    status("Gespeichert ✔ – in ca. 1–2 Minuten auf der Startseite sichtbar.", "ok");
+  } catch(e){ status("Speichern fehlgeschlagen – Verbindung prüfen.", "err"); }
+  finally { $("save").disabled = false; }
+};
+
+// ---------- Bearbeiten
+function validUrl(u){ try { return /^https?:$/.test(new URL(u).protocol); } catch(e){ return false; } }
+function setDirty(v){ dirty = v; $("dirty").classList.toggle("on", v); }
+function confirmDiscard(){ return window.confirm("Ungespeicherte Änderungen verwerfen?"); }
+window.addEventListener("beforeunload", e => { if (dirty){ e.preventDefault(); e.returnValue = ""; } });
+
+function cellInput(val, type, onInput){
+  const i = document.createElement("input"); i.type = type; i.value = val;
+  i.oninput = () => { onInput(i.value); setDirty(true); }; return i;
+}
+function btn(txt, title, fn, cls){
+  const b = document.createElement("button"); b.type = "button"; b.className = "btn sm " + (cls || "");
+  b.textContent = txt; b.title = title; b.setAttribute("aria-label", title); b.onclick = fn; return b;
+}
+function render(){
+  const tb = $("rows"); tb.textContent = "";
+  $("empty").hidden = links.length > 0;
+  links.forEach((l, i) => {
+    const tr = document.createElement("tr");
+    const td1 = document.createElement("td"); td1.appendChild(cellInput(l.title, "text", v => l.title = v));
+    const td2 = document.createElement("td"); td2.appendChild(cellInput(l.sub, "text", v => l.sub = v));
+    const td3 = document.createElement("td"); td3.appendChild(cellInput(l.url, "url", v => l.url = v));
+    const td4 = document.createElement("td"); td4.className = "act";
+    const up = btn("▲", "Nach oben", () => move(i, -1)); up.disabled = i === 0;
+    const dn = btn("▼", "Nach unten", () => move(i, 1)); dn.disabled = i === links.length - 1;
+    td4.append(up, " ", dn, " ", btn("✕", "Löschen", () => { links.splice(i, 1); setDirty(true); render(); }, "del"));
+    tr.append(td1, td2, td3, td4); tb.appendChild(tr);
+  });
+}
+function move(i, d){ const j = i + d; [links[i], links[j]] = [links[j], links[i]]; setDirty(true); render(); }
+
+$("add").onsubmit = e => {
+  e.preventDefault();
+  let url = $("nUrl").value.trim();
+  if (url && !/^https?:\/\//i.test(url)) url = "https://" + url;
+  if (!validUrl(url)){ status("Bitte eine gültige Adresse eingeben.", "err"); return; }
+  links.push({ title:$("nTitle").value.trim(), sub:$("nSub").value.trim(), url });
+  $("add").reset(); setDirty(true); render();
+  status("Hinzugefügt – zum Veröffentlichen „Speichern“ klicken.", "info");
+  $("nTitle").focus();
+};
+
+loadCfg();
+if ($("token").value) $("load").click();
+</script>
+</body>
+</html>

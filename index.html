@@ -120,11 +120,17 @@ const $ = id => document.getElementById(id);
 const MON = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 const p2 = n => String(n).padStart(2, "0");
 
+// ---------- Kalenderwoche nach ISO 8601 (Woche beginnt Montag, KW 1 enthält den ersten Donnerstag)
+function isoWeek(d){
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  return Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 864e5 + 1) / 7);
+}
 // ---------- Uhr: Ortszeit, Zulu, Datum-Zeit-Gruppe
 function clock(){
   const d = new Date();
   $("time").textContent = d.toLocaleTimeString("de-DE");
-  $("date").textContent = d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  $("date").textContent = d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) + " · KW " + isoWeek(d);
   $("zulu").textContent = `${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}:${p2(d.getUTCSeconds())}Z`;
   // DTG nach NATO-Schema: TTHHMMZ MON JJ
   $("dtg").textContent = `${p2(d.getUTCDate())}${p2(d.getUTCHours())}${p2(d.getUTCMinutes())}Z ${MON[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(-2)}`;
